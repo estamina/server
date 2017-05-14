@@ -15,11 +15,15 @@ public class ChatServer {
             ((ClientThread)i.next()).sendMessage(message);
     }
 
+	String getNick(String user){
+		return "nick_"+user;
+	}
+
     //Vlakno komunikacie s klientom
     class ClientThread extends Thread {
         //Pomocou tohto socketu komunikujem s klientom
         Socket clientSocket;
-		public String user;
+		public String user,nick;
         //Streamy
         BufferedReader in;
         //OutputStreamWriter out;
@@ -64,13 +68,14 @@ public class ChatServer {
 							line = in.readLine();
 							int users=new Integer(line).intValue();
 
-							line = in.readLine();user=line;
+							line = in.readLine();user=line;	 nick=getNick(user);
 										  // System.out.println(user);
 							StringBuffer  userListGlobal = new StringBuffer(new String(""));
 
 							for(Iterator i=clientsList.iterator();i.hasNext();){
 //								System.out.println(userListGlobal+" in");
-								userListGlobal.append("\n"+((ClientThread)i.next()).user);
+								ClientThread ct= (ClientThread)i.next();
+								userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
 //								System.out.println(userListGlobal+" in");
 							}
 
@@ -107,8 +112,10 @@ public class ChatServer {
 
 							for(Iterator i=clientsList.iterator();i.hasNext();){
 //								System.out.println(userListGlobal+" in");
-								String auser=((ClientThread)i.next()).user;
-								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser);
+								ClientThread ct= (ClientThread)i.next();
+								String auser=ct.user;
+								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser+"\n"+ct.nick);
+//								userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
 //								System.out.println(userListGlobal+" in");
 							}
 
