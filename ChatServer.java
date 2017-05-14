@@ -52,7 +52,7 @@ public class ChatServer {
         }
 
         //Poslanie spravy pre jedneho klienta
-        synchronized void sendMessage(String message){
+         void sendMessage(String message){
             try{
 
  				out.write(message+"\n");
@@ -76,101 +76,7 @@ public class ChatServer {
                 //Precitam riadok
                 while ((line = in.readLine()) != null) {
                       while (line.compareTo(msgIntro)!=0){line = in.readLine();}
-                    line = in.readLine();
-                  //Vypis pre testovanie
-                    System.out.println("----------received\nmsgcode:"+line);
-                    //Rozpozlem spravu vsetkym
-
-					int msgCode=new Integer(line).intValue();
-					switch (msgCode)
-					{
-						case 6:
-							line = in.readLine();
-							int users=new Integer(line).intValue();
-
-							line = in.readLine();user=line;	 nick=getNick(user);
-										  // System.out.println(user);
-							StringBuffer  userListGlobal = new StringBuffer(new String(""));
-
-							for(Iterator i=clientsList.iterator();i.hasNext();){
-//								System.out.println(userListGlobal+" in");
-								ClientThread ct= (ClientThread)i.next();
-								userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
-//								System.out.println(userListGlobal+" in");
-							}
-
-							sendToAll(msgIntro+"\n1\n"+clientsList.size()+userListGlobal.toString());
-
-							break;
-						case 0:
-			
-							line = in.readLine();
-							System.out.println("chatid: "+line);
-                                                        
-                                                        int chatid=new Integer(line).intValue();
-                                                        chat thechat=new chat();
-                                                        //LinkedList thechat.users=null;
-                                                        //thechat.users=new LinkedList();
-                                                        if (chatid<0) {
-                                                            
-                                                            thechat.users.add(this);
-                                                            
-                                                        }else thechat.users=(LinkedList)chats.get(chatid);
-							
-							line = in.readLine();
-							System.out.println("users:"+line);
-							int chatters=new Integer(line).intValue();
-
-                                                        if (chatid<0){ 
-                                                            line = in.readLine();
-                                                            System.out.println("user:"+line);
-                                                            thechat.users.add(getUserThread(line));
-                                                            chatid=chats.size();
-                                                            if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
-                                                            chats.add(thechat.users);
-                                                        }else{
-                                                            for (int i=0;i<chatters;i++){
-                                                                line = in.readLine();
-                                                                thechat.users.add(getUserThread(line));
-                                                                System.out.println("user:"+line);
-                                                            }
-                                                            if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
-                                                        }
-                                                        
-                                                        
-                                                        
-							line = in.readLine();
-							System.out.println("chatname:"+line);
-
-							line = in.readLine();
-							System.out.println("lines:"+line);
-							int lines=new Integer(line).intValue();
-							line = in.readLine();
-							System.out.println("line:"+line);
-							//System.out.println(line);
-                                                        
-                                                        StringBuffer usersline=new StringBuffer();
-                                                        int clients=thechat.users.size();
-                                                        for(Iterator i=thechat.users.iterator();i.hasNext();){
-                                                            ClientThread h=(ClientThread)i.next();
-                                                            usersline.append(h.user+"\n");
-                                                            usersline.append(h.nick+"\n");
-                                                        }
-                                                        
-                                                        //todo: is inside sendToChat
-                                                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
-                                                        
-                                                        if (thechat.name!=null) sendToChat(chatid,msgIntro+"\n3\n1\n"+chatid+"\n"+thechat.name);
-                                                        sendToChat(chatid,msgIntro+"\n4\n"+chatid+"\n"+lines+"\n"+line);
-                                                        //sendToThem(thechat.users,"0\n"+lines+"\n"+line);
-							//sendToAll("0\n"+lines+"\n"+line);
-                                                        break;
-						default:
-//						sendToAll(line.substring(1));break;
-//						sendToAll("\0"+line.substring(1));break;
-
-					}
-
+                      decode();
                 }
 
                 //Uzavriem streamy
@@ -200,6 +106,112 @@ public class ChatServer {
 							sendToAll(msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());
             clientsList.remove(this);
         }
+
+        synchronized public void decode() {
+            String line;
+            try {
+                line = in.readLine();
+                //Vypis pre testovanie
+                System.out.println("----------received\nmsgcode:"+line);
+                //Rozpozlem spravu vsetkym
+
+                int msgCode=new Integer(line).intValue();
+                switch (msgCode)
+                {
+                    case 6:
+                            //Pridam do zoznamu klientov
+                            clientsList.add(this);
+
+                            line = in.readLine();
+                            int users=new Integer(line).intValue();
+
+                            line = in.readLine();user=line;	 nick=getNick(user);
+                                                      // System.out.println(user);
+                            StringBuffer  userListGlobal = new StringBuffer(new String(""));
+
+                            for(Iterator i=clientsList.iterator();i.hasNext();){
+//								System.out.println(userListGlobal+" in");
+                                    ClientThread ct= (ClientThread)i.next();
+                                    userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
+//								System.out.println(userListGlobal+" in");
+                            }
+
+                            sendToAll(msgIntro+"\n1\n"+clientsList.size()+userListGlobal.toString());
+
+                            break;
+                    case 0:
+
+                            line = in.readLine();
+                            System.out.println("chatid: "+line);
+
+                            int chatid=new Integer(line).intValue();
+                            chat thechat=new chat();
+                            //LinkedList thechat.users=null;
+                            //thechat.users=new LinkedList();
+                            if (chatid<0) {
+
+                                thechat.users.add(this);
+
+                            }else thechat.users=(LinkedList)chats.get(chatid);
+
+                            line = in.readLine();
+                            System.out.println("users:"+line);
+                            int chatters=new Integer(line).intValue();
+
+                            if (chatid<0){ 
+                                line = in.readLine();
+                                System.out.println("user:"+line);
+                                thechat.users.add(getUserThread(line));
+                                chatid=chats.size();
+                                if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
+                                chats.add(thechat.users);
+                            }else{
+                                for (int i=0;i<chatters;i++){
+                                    line = in.readLine();
+                                    thechat.users.add(getUserThread(line));
+                                    System.out.println("user:"+line);
+                                }
+                                if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
+                            }
+
+
+
+                            line = in.readLine();
+                            System.out.println("chatname:"+line);
+
+                            line = in.readLine();
+                            System.out.println("lines:"+line);
+                            int lines=new Integer(line).intValue();
+                            line = in.readLine();
+                            System.out.println("line:"+line);
+                            //System.out.println(line);
+
+                            StringBuffer usersline=new StringBuffer();
+                            int clients=thechat.users.size();
+                            for(Iterator i=thechat.users.iterator();i.hasNext();){
+                                ClientThread h=(ClientThread)i.next();
+                                usersline.append(h.user+"\n");
+                                usersline.append(h.nick+"\n");
+                            }
+
+                            //todo: is inside sendToChat
+                            sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+
+                            if (thechat.name!=null) sendToChat(chatid,msgIntro+"\n3\n1\n"+chatid+"\n"+thechat.name);
+                            sendToChat(chatid,msgIntro+"\n4\n"+chatid+"\n"+lines+"\n"+line);
+                            //sendToThem(thechat.users,"0\n"+lines+"\n"+line);
+                            //sendToAll("0\n"+lines+"\n"+line);
+                            break;
+                    default:
+//						sendToAll(line.substring(1));break;
+//						sendToAll("\0"+line.substring(1));break;
+
+                }
+            }catch (Exception e){
+                System.out.println("Chyba6 "+e.getMessage());
+            }
+            
+        }
     }
 
     //Tato metoda predstavuje cyklus obsluhy
@@ -208,13 +220,11 @@ public class ChatServer {
             //Pomocou tohto socketu cakam na pripojenie - na porte
             ServerSocket socket = new ServerSocket(CHAT_PORT);
 
-            //Nekonecny cyklus na servery - obsluhy
+            //Nekonecny cyklus na serveri - obsluhy
             while(true){
                 Socket acceptedSocket = socket.accept();
                 //Vytvaram vlakno obsluhy
                 ClientThread ct = new ClientThread(acceptedSocket);
-                //Pridam do zoznamu klientov
-                clientsList.add(ct);
                 //a zacnem obsluhu
                 ct.start();
             }
