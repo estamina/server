@@ -10,6 +10,7 @@ public class ChatServer {
 
     //Rozoslanie spravy vsetkym
     private void sendToAll(String message){
+		System.out.println("snd "+(int)message.charAt(0)+" "+(message.length()-2)+" "+message.substring(1));
         for(Iterator i=clientsList.iterator();i.hasNext();)
             ((ClientThread)i.next()).sendMessage(message);
     }
@@ -21,7 +22,8 @@ public class ChatServer {
 
         //Streamy
         BufferedReader in;
-        OutputStreamWriter out;
+        //OutputStreamWriter out;
+		BufferedWriter out;
 
         ClientThread(Socket clientSocket){
             this.clientSocket=clientSocket;
@@ -30,7 +32,10 @@ public class ChatServer {
         //Poslanie spravy pre jedneho klienta
         synchronized void sendMessage(String message){
             try{
-                out.write(message+"\n");
+
+                out.write(message.charAt(0));
+				out.write(message.length()-2);
+				out.write(message.substring(1)+"\n");
                 //Vyprazdnim buffer a tym prinutim poslat
                 out.flush();
             }catch (Exception e){
@@ -38,20 +43,34 @@ public class ChatServer {
             }
         }
 
+
         public void run() {
             try{
                 //Streamy
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new OutputStreamWriter(clientSocket.getOutputStream());
+//                out = new OutputStreamWriter(clientSocket.getOutputStream());
+                out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
                 String line;
                 //Precitam riadok
                 while ((line = in.readLine()) != null) {
-                    //Rozpozlem spravu vsetkym
-                    sendToAll(line);
-
                     //Vypis pre testovanie
-                    System.out.println(line);
+                    System.out.println("rcv"+line);
+                    //Rozpozlem spravu vsetkym
+
+					char msgCode=line.charAt(0);
+					switch (msgCode)
+					{
+						case 0x06:
+                    	sendToAll("\1"+line.substring(1));break;
+						case 0x00:
+						sendToAll("\0"+line.substring(1));break;
+						default:
+//						sendToAll(line.substring(1));break;
+//						sendToAll("\0"+line.substring(1));break;
+
+					}
+
                 }
 
                 //Uzavriem streamy
