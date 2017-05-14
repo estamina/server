@@ -192,7 +192,7 @@ public class ChatServer {
 //								System.out.println(userListGlobal+" in");
 								ClientThread ct= (ClientThread)i.next();
 								String auser=ct.user;
-								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser+"\n"+ct.nick);
+								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser+"\n"+ct.nick);//todo: was null!
 //								userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
 //								System.out.println(userListGlobal+" in");
 							}
