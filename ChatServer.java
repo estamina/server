@@ -98,13 +98,28 @@ public class ChatServer {
 //								System.out.println(userListGlobal+" in");
 								ClientThread ct= (ClientThread)i.next();
 								String auser=ct.user;
-								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser+"\n"+ct.nick);//todo: was null!
+								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser+"\n"+ct.nick);//todo: was null with great delay not doing any thing!
+                                                                //chyba1 triggers chyba2 with this code i think
+                                                                else {
+                                                                    
+                                                                }
 //								userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
 //								System.out.println(userListGlobal+" in");
 							}
 
+                                                       System.out.println(" CHAT"); 
+                                                        for(int i=0;i<chats.size();i++){
+                                                            LinkedList chusers=(LinkedList)chats.get(i);
+                                                            if (chusers.contains(this)) {
+                                                                chusers.remove(this);
+                                                                sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+userListGlobal.toString().trim());
+                                                                sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" exits");
+                                                            }
+                                                       System.out.println(" in chat");
+                                                        }
 							sendToAll(msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());
-            clientsList.remove(this);
+
+                                                        clientsList.remove(this);
         }
 
         synchronized public void decode() {
