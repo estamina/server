@@ -132,8 +132,9 @@ public class ChatServer {
 							System.out.println("line:"+line);
 							//System.out.println(line);
                                                         
-                                                        
-							//sendToAll("0\n"+lines+"\n"+line);break;
+                                                        sendToThem(chatusers,"0\n"+lines+"\n"+line);
+							//sendToAll("0\n"+lines+"\n"+line);
+                                                        break;
 						default:
 //						sendToAll(line.substring(1));break;
 //						sendToAll("\0"+line.substring(1));break;
@@ -199,4 +200,11 @@ public class ChatServer {
     }
 
     private ArrayList chats= new ArrayList();
+
+    public void sendToThem(LinkedList them, String message) {
+        System.out.println("-------sent\n"+message);
+        for(Iterator i=them.iterator();i.hasNext();)
+            ((ClientThread)i.next()).sendMessage(message);
+
+    }
 }
