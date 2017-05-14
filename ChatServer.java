@@ -112,6 +112,7 @@ public class ChatServer {
                                                             LinkedList chusers=(LinkedList)chats.get(i);
                                                             if (chusers.contains(this)) {
                                                                 chusers.remove(this);
+                                                                sendToChat(i,msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());
                                                                 sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+userListGlobal.toString().trim());
                                                                 sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" exits");
                                                             }
