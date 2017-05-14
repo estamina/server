@@ -108,6 +108,7 @@ public class ChatServer {
 							System.out.println("chatid: "+line);
                                                         
                                                         int chatid=new Integer(line).intValue();
+                                                        int chatidwas=chatid;
                                                         LinkedList chatusers=null;
                                                         chatusers=new LinkedList();
                                                         if (chatid<0) {
@@ -148,7 +149,7 @@ public class ChatServer {
                                                         }
                                                         
 
-                                                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+                                                        if (chatidwas==-1) sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
                                                         sendToChat(chatid,msgIntro+"\n0\n"+chatid+"\n"+lines+"\n"+line);
                                                         //sendToThem(chatusers,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
