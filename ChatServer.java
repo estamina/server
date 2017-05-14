@@ -10,7 +10,7 @@ public class ChatServer {
 
     //Rozoslanie spravy vsetkym
     private void sendToAll(String message){
-		System.out.println("snd\n"+message);
+		System.out.println("-------sent\n"+message);
         for(Iterator i=clientsList.iterator();i.hasNext();)
             ((ClientThread)i.next()).sendMessage(message);
     }
@@ -18,6 +18,23 @@ public class ChatServer {
 	String getNick(String user){
 		return "nick_"+user;
 	}
+        
+    public ClientThread getUserThread(String user) {
+        //String user=null;
+        ClientThread needle=null;
+        for (Iterator i=clientsList.iterator();i.hasNext();){
+             needle=(ClientThread)i.next();
+                System.out.println(needle.user+" "+needle.nick+" "+user.trim());
+            if ((needle).user.compareTo(user.trim())==0) {
+                //user=needle.user;
+                                System.out.println(needle.user+" found "+needle.nick);
+
+                break;
+            }
+        }
+        return needle;
+    }
+
 
     //Vlakno komunikacie s klientom
     class ClientThread extends Thread {
@@ -58,7 +75,7 @@ public class ChatServer {
                 //Precitam riadok
                 while ((line = in.readLine()) != null) {
                     //Vypis pre testovanie
-                    System.out.println("rcv\n"+line);
+                    System.out.println("----------received\nmsgcode:"+line);
                     //Rozpozlem spravu vsetkym
 
 					int msgCode=new Integer(line).intValue();
@@ -83,33 +100,40 @@ public class ChatServer {
 
 							break;
 						case 0:
-/*
+			
 							line = in.readLine();
-							int lines=new Integer(line).intValue();
+							System.out.println("chatid: "+line);
+                                                        
+                                                        int chatid=new Integer(line).intValue();
+                                                        LinkedList chatusers=null;
+                                                        if (chatid<0) {
+                                                            chatusers=new LinkedList();
+                                                            chatusers.add(this);
+                                                            
+                                                        }
+							
 							line = in.readLine();
-							sendToAll("0\n"+lines+"\n"+line);break;
-*/
-							//chatid
-							line = in.readLine();
-							System.out.println(line);
-							//no + chatobe
-							line = in.readLine();
-							System.out.println(line);
+							System.out.println("users:"+line);
 							int chatters=new Integer(line).intValue();
 							line = in.readLine();
-							System.out.println(line);
-
-							//chatname
+							System.out.println("user:"+line);
+                                                            if (chatid<0) chatusers.add(getUserThread(line));
+                                                            chats.add(chatusers);
+                                                        
+                                                        
+                                                        
 							line = in.readLine();
-							System.out.println(line);
+							System.out.println("chatname:"+line);
 
-							//message
 							line = in.readLine();
-							System.out.println(line);
+							System.out.println("lines:"+line);
 							int lines=new Integer(line).intValue();
 							line = in.readLine();
-							System.out.println(line);
-							sendToAll("0\n"+lines+"\n"+line);break;
+							System.out.println("line:"+line);
+							//System.out.println(line);
+                                                        
+                                                        
+							//sendToAll("0\n"+lines+"\n"+line);break;
 						default:
 //						sendToAll(line.substring(1));break;
 //						sendToAll("\0"+line.substring(1));break;
@@ -173,4 +197,6 @@ public class ChatServer {
         ChatServer server = new ChatServer();
         server.main();
     }
+
+    private ArrayList chats= new ArrayList();
 }
