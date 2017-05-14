@@ -109,13 +109,14 @@ public class ChatServer {
                                                         
                                                         int chatid=new Integer(line).intValue();
                                                         int chatidwas=chatid;
-                                                        LinkedList chatusers=null;
-                                                        chatusers=new LinkedList();
+                                                        chat thechat=new chat();
+                                                        //LinkedList thechat.users=null;
+                                                        //thechat.users=new LinkedList();
                                                         if (chatid<0) {
                                                             
-                                                            chatusers.add(this);
+                                                            thechat.users.add(this);
                                                             
-                                                        }else chatusers=(LinkedList)chats.get(chatid);
+                                                        }else thechat.users=(LinkedList)chats.get(chatid);
 							
 							line = in.readLine();
 							System.out.println("users:"+line);
@@ -124,15 +125,17 @@ public class ChatServer {
                                                         if (chatid<0){ 
                                                             line = in.readLine();
                                                             System.out.println("user:"+line);
-                                                            chatusers.add(getUserThread(line));
+                                                            thechat.users.add(getUserThread(line));
                                                             chatid=chats.size();
-                                                            chats.add(chatusers);
+                                                            if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
+                                                            chats.add(thechat.users);
                                                         }else{
                                                             for (int i=0;i<chatters;i++){
                                                                 line = in.readLine();
-                                                                chatusers.add(getUserThread(line));
+                                                                thechat.users.add(getUserThread(line));
                                                                 System.out.println("user:"+line);
                                                             }
+                                                            if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
                                                             chatidwas=-1;
                                                         }
                                                         
@@ -149,8 +152,8 @@ public class ChatServer {
 							//System.out.println(line);
                                                         
                                                         StringBuffer usersline=new StringBuffer();
-                                                        int clients=chatusers.size();
-                                                        for(Iterator i=chatusers.iterator();i.hasNext();){
+                                                        int clients=thechat.users.size();
+                                                        for(Iterator i=thechat.users.iterator();i.hasNext();){
                                                             ClientThread h=(ClientThread)i.next();
                                                             usersline.append(h.user+"\n");
                                                             usersline.append(h.nick+"\n");
@@ -159,7 +162,7 @@ public class ChatServer {
 
                                                         if (chatidwas==-1) sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
                                                         sendToChat(chatid,msgIntro+"\n0\n"+chatid+"\n"+lines+"\n"+line);
-                                                        //sendToThem(chatusers,"0\n"+lines+"\n"+line);
+                                                        //sendToThem(thechat.users,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
                                                         break;
 						default:
@@ -241,4 +244,13 @@ public class ChatServer {
         for(Iterator i=them.iterator();i.hasNext();)
             ((ClientThread)i.next()).sendMessage(message);
 }
+
+    public final class chat {
+        private String name;
+
+        private LinkedList users=new LinkedList();
+    }
+
+
+
 }
