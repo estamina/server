@@ -21,6 +21,12 @@ public class ChatServer {
      * todo: configuration file with nicknames
      */
     String getNick(String user){
+        for (int i=0;i<users.size();i++){
+            skUser uu=(skUser)users.get(i);
+            if (uu.user.compareTo(user)==0){
+               return uu.nick;
+            }
+        }
         return "nick_"+user;
     }
     
@@ -179,7 +185,7 @@ public class ChatServer {
                             System.out.println("user:"+line);
                             thechat.users.add(getUserThread(line));
                             chatid=chats.size();
-                            if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
+                            if (thechat.users.size()>2) thechat.name=new String(chatid+"#");
                             chats.add(thechat.users);
                         }else{
                             for (int i=0;i<chatters;i++){
@@ -188,7 +194,7 @@ public class ChatServer {
                                     thechat.users.add(getUserThread(line));
                                 System.out.println("user:"+line);
                             }
-                            if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
+                            if (thechat.users.size()>2) thechat.name=new String(chatid+"#");
                         }
                         
                         
@@ -228,6 +234,7 @@ public class ChatServer {
     
     
     private void main(){
+        downloadNicks();
         try{
             //waiting for socket on this port
             ServerSocket socket = new ServerSocket(CHAT_PORT);
@@ -275,5 +282,42 @@ public class ChatServer {
          */
         private LinkedList users=new LinkedList();
     }
+
+    public final class skUser {
+        private String user;
+
+        private String nick;
+
+        private String family_name;
+
+        private String given_name;
+    }
+
+    /**
+     * nicknames from names.cfg file
+     */
+    private ArrayList users=new ArrayList();
+
+    public void downloadNicks() {
+        try {
+            BufferedReader afile=new BufferedReader(new FileReader("names.cfg"));;
+            String line;
+            while((line=afile.readLine())!=null){
+                skUser uu=new skUser();
+                uu.user=line;
+                uu.nick=afile.readLine();
+                uu.family_name=afile.readLine();
+                uu.given_name=afile.readLine();
+                users.add(uu);
+            }
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            System.out.println("Chyba "+ex.getMessage());
+        } catch (IOException ex){
+            ex.printStackTrace();
+            System.out.println("Chyba "+ex.getMessage());
+        }
+    }
+
     
 }
