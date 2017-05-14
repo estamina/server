@@ -108,7 +108,6 @@ public class ChatServer {
 							System.out.println("chatid: "+line);
                                                         
                                                         int chatid=new Integer(line).intValue();
-                                                        int chatidwas=chatid;
                                                         chat thechat=new chat();
                                                         //LinkedList thechat.users=null;
                                                         //thechat.users=new LinkedList();
@@ -136,7 +135,6 @@ public class ChatServer {
                                                                 System.out.println("user:"+line);
                                                             }
                                                             if (thechat.users.size()>2) thechat.name=new String("room"+chatid);
-                                                            chatidwas=-1;
                                                         }
                                                         
                                                         
@@ -159,8 +157,9 @@ public class ChatServer {
                                                             usersline.append(h.nick+"\n");
                                                         }
                                                         
-
-                                                        if (chatidwas==-1) sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+                                                        //todo: is inside sendToChat
+                                                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+                                                        
                                                         if (thechat.name!=null) sendToChat(chatid,msgIntro+"\n3\n1\n"+chatid+"\n"+thechat.name);
                                                         sendToChat(chatid,msgIntro+"\n4\n"+chatid+"\n"+lines+"\n"+line);
                                                         //sendToThem(thechat.users,"0\n"+lines+"\n"+line);
@@ -240,6 +239,8 @@ public class ChatServer {
     }
 
     public void sendToChat(int chatid,String message) {
+        //todo: on code 2 it should be only first time members of chatid
+        //now it sends every time
         LinkedList them=(LinkedList)chats.get(chatid);
         System.out.println("-------sent\n"+message);
         for(Iterator i=them.iterator();i.hasNext();)
