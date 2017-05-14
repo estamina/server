@@ -146,7 +146,7 @@ public class ChatServer {
                                                         
 
                                                         sendToChat(chatid,"2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
-                                                        sendToChat(chatid,"0\n"+lines+"\n"+line);
+                                                        sendToChat(chatid,"0\n"+chatid+"\n"+lines+"\n"+line);
                                                         //sendToThem(chatusers,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
                                                         break;
