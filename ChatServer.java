@@ -106,21 +106,21 @@ public class ChatServer {
 //								userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
 //								System.out.println(userListGlobal+" in");
 							}
+                                                        clientsList.remove(this);
+							sendToAll(msgIntro+"\n1\n"+(clientsList.size())+userListGlobal.toString());//gets exception, one ct is missing
+
 
                                                        System.out.println(" CHAT"); 
                                                         for(int i=0;i<chats.size();i++){
                                                             LinkedList chusers=(LinkedList)chats.get(i);
                                                             if (chusers.contains(this)) {
                                                                 chusers.remove(this);
-                                                                sendToChat(i,msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());
+//                                                                sendToChat(i,msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());//does not get exception sets skGlobalUsers in next  message 2
                                                                 sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+userListGlobal.toString().trim());
                                                                 sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" exits");
                                                             }
                                                        System.out.println(" in chat");
                                                         }
-							sendToAll(msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());
-
-                                                        clientsList.remove(this);
         }
 
         synchronized public void decode() {
