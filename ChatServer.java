@@ -106,11 +106,12 @@ public class ChatServer {
                                                         
                                                         int chatid=new Integer(line).intValue();
                                                         LinkedList chatusers=null;
+                                                        chatusers=new LinkedList();
                                                         if (chatid<0) {
-                                                            chatusers=new LinkedList();
+                                                            
                                                             chatusers.add(this);
                                                             
-                                                        }
+                                                        }else chatusers=(LinkedList)chats.get(chatid);
 							
 							line = in.readLine();
 							System.out.println("users:"+line);
@@ -135,6 +136,16 @@ public class ChatServer {
 							System.out.println("line:"+line);
 							//System.out.println(line);
                                                         
+                                                        StringBuffer usersline=new StringBuffer();
+                                                        int clients=chatusers.size();
+                                                        for(Iterator i=chatusers.iterator();i.hasNext();){
+                                                            ClientThread h=(ClientThread)i.next();
+                                                            usersline.append(h.user+"\n");
+                                                            usersline.append(h.nick+"\n");
+                                                        }
+                                                        
+
+                                                        sendToChat(chatid,"2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
                                                         sendToChat(chatid,"0\n"+lines+"\n"+line);
                                                         //sendToThem(chatusers,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
