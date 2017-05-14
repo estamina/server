@@ -120,8 +120,10 @@ public class ChatServer {
 							line = in.readLine();
 							System.out.println("users:"+line);
 							int chatters=new Integer(line).intValue();
-							line = in.readLine();
-							System.out.println("user:"+line);
+                                                        for (int i=0;i<chatters;i++){
+                                                            line = in.readLine();
+                                                            System.out.println("user:"+line);
+                                                        }
                                                             if (chatid<0){ 
                                                                 chatusers.add(getUserThread(line));
                                                                 chatid=chats.size();
