@@ -124,7 +124,7 @@ public class ChatServer {
                 LinkedList chusers=(LinkedList)chats.get(i);
                 if (chusers.contains(this)) {
                     chusers.remove(this);
-                    sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+serializeUsers(chusers));
+                    sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+serializeUsers(chusers));
                     sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" disappeared");
                 }
                 System.out.println(" in chat");
@@ -151,7 +151,7 @@ public class ChatServer {
                             LinkedList chusers=(LinkedList)chats.get(i);
                             if (chusers.contains(this)) {
                                 chusers.remove(this);
-                                sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+serializeUsers(chusers));
+                                sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+serializeUsers(chusers));
                                 sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" left this chat");
                             }
                             System.out.println(" in chat");
@@ -234,7 +234,7 @@ public class ChatServer {
                         
                         //todo: is inside sendToChat
 //                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
-                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+thechat.users.size()+"\n"+serializeUsers(thechat.users));
+                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+thechat.users.size()+serializeUsers(thechat.users));
                         
                         
                         if (thechat.name!=null) sendToChat(chatid,msgIntro+"\n3\n1\n"+chatid+"\n"+thechat.name);
@@ -253,12 +253,13 @@ public class ChatServer {
             StringBuffer usersline=new StringBuffer();
             int clients=users.size();
             for(Iterator i=users.iterator();i.hasNext();){
-                ClientThread h=(ClientThread)i.next();
-                usersline.append(h.user+"\n");
-                usersline.append(h.nick+"\n");
+                ClientThread ct=(ClientThread)i.next();
+                usersline.append("\n"+ct.user+"\n"+ct.nick);
+                //usersline.append(h.user+"\n");
+                //usersline.append(h.nick+"\n");
             }
             
-            return usersline.toString().trim();
+            return usersline.toString();//.trim();
         }
     }
     
