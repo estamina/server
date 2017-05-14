@@ -27,7 +27,7 @@ public class ChatServer {
                return uu.nick;
             }
         }
-        return "nick_"+user;
+        return user;
     }
     
     /**
@@ -144,6 +144,22 @@ public class ChatServer {
                 
                 int msgCode=new Integer(line).intValue();
                 switch (msgCode) {
+                    case 9:
+                        int chatid=new Integer(line).intValue();//!!!!!!!!!!!
+            StringBuffer  userListGlobal = new StringBuffer(new String(""));                        
+            System.out.println(" CHAT");
+            for(int i=0;i<chats.size();i++){
+                LinkedList chusers=(LinkedList)chats.get(i);
+                if (chusers.contains(this)) {
+                    chusers.remove(this);
+//            sendToChat(i,msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());//does not get exception sets skGlobalUsers in next  message 2
+                    sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+userListGlobal.toString().trim());
+                    sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" exits");
+                }
+                System.out.println(" in chat");
+            }
+                        
+                        break;
                     case 6:
                         clientsList.add(this);
                         
@@ -152,7 +168,8 @@ public class ChatServer {
                         
                         line = in.readLine();user=line;	 nick=getNick(user);
                         
-                        StringBuffer  userListGlobal = new StringBuffer(new String(""));
+                        //StringBuffer//!!!!!!!!!!!!!!!!!!!
+                                userListGlobal = new StringBuffer(new String(""));
                         
                         for(Iterator i=clientsList.iterator();i.hasNext();){
                             ClientThread ct= (ClientThread)i.next();
@@ -167,7 +184,7 @@ public class ChatServer {
                         line = in.readLine();
                         System.out.println("chatid: "+line);
                         
-                        int chatid=new Integer(line).intValue();
+                         chatid=new Integer(line).intValue();//!!!!!!!!!!!
                         chat thechat=new chat();
                         
                         if (chatid<0) {
