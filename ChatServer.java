@@ -168,6 +168,7 @@ public class ChatServer {
                             }else{
                                 for (int i=0;i<chatters;i++){
                                     line = in.readLine();
+                                    if (!thechat.users.contains(getUserThread(line)))
                                     thechat.users.add(getUserThread(line));
                                     System.out.println("user:"+line);
                                 }
