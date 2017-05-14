@@ -83,9 +83,32 @@ public class ChatServer {
 
 							break;
 						case 0:
+/*
 							line = in.readLine();
 							int lines=new Integer(line).intValue();
 							line = in.readLine();
+							sendToAll("0\n"+lines+"\n"+line);break;
+*/
+							//chatid
+							line = in.readLine();
+							System.out.println(line);
+							//no + chatobe
+							line = in.readLine();
+							System.out.println(line);
+							int chatters=new Integer(line).intValue();
+							line = in.readLine();
+							System.out.println(line);
+
+							//chatname
+							line = in.readLine();
+							System.out.println(line);
+
+							//message
+							line = in.readLine();
+							System.out.println(line);
+							int lines=new Integer(line).intValue();
+							line = in.readLine();
+							System.out.println(line);
 							sendToAll("0\n"+lines+"\n"+line);break;
 						default:
 //						sendToAll(line.substring(1));break;
