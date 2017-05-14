@@ -24,7 +24,7 @@ public class ChatServer {
         for (int i=0;i<users.size();i++){
             skUser uu=(skUser)users.get(i);
             if (uu.user.compareTo(user)==0){
-               return uu.nick;
+                return uu.nick;
             }
         }
         return user;
@@ -84,12 +84,12 @@ public class ChatServer {
         
         public void run() {
             try{
-
+                
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                 
                 String line;
-
+                
                 //endless loop
                 while ((line = in.readLine()) != null) {
                     //fishing for the intro byte indicating a valid message start
@@ -124,9 +124,8 @@ public class ChatServer {
                 LinkedList chusers=(LinkedList)chats.get(i);
                 if (chusers.contains(this)) {
                     chusers.remove(this);
-//            sendToChat(i,msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());//does not get exception sets skGlobalUsers in next  message 2
-                    sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+userListGlobal.toString().trim());
-                    sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" exits");
+                    sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+serializeUsers(chusers));
+                    sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" disappeared");
                 }
                 System.out.println(" in chat");
             }
@@ -146,18 +145,17 @@ public class ChatServer {
                 switch (msgCode) {
                     case 9:
                         int chatid=new Integer(line).intValue();//!!!!!!!!!!!
-            StringBuffer  userListGlobal = new StringBuffer(new String(""));                        
-            System.out.println(" CHAT");
-            for(int i=0;i<chats.size();i++){
-                LinkedList chusers=(LinkedList)chats.get(i);
-                if (chusers.contains(this)) {
-                    chusers.remove(this);
-//            sendToChat(i,msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());//does not get exception sets skGlobalUsers in next  message 2
-                    sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+userListGlobal.toString().trim());
-                    sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" exits");
-                }
-                System.out.println(" in chat");
-            }
+
+                        System.out.println(" CHAT");
+                        for(int i=0;i<chats.size();i++){
+                            LinkedList chusers=(LinkedList)chats.get(i);
+                            if (chusers.contains(this)) {
+                                chusers.remove(this);
+                                sendToChat(i,msgIntro+"\n2\n"+i+"\n"+chusers.size()+"\n"+serializeUsers(chusers));
+                                sendToChat(i,msgIntro+"\n4\n"+i+"\n1\n"+nick+" left this chat");
+                            }
+                            System.out.println(" in chat");
+                        }
                         
                         break;
                     case 6:
@@ -168,8 +166,7 @@ public class ChatServer {
                         
                         line = in.readLine();user=line;	 nick=getNick(user);
                         
-                        //StringBuffer//!!!!!!!!!!!!!!!!!!!
-                                userListGlobal = new StringBuffer(new String(""));
+                        StringBuffer userListGlobal = new StringBuffer(new String(""));
                         
                         for(Iterator i=clientsList.iterator();i.hasNext();){
                             ClientThread ct= (ClientThread)i.next();
@@ -184,7 +181,7 @@ public class ChatServer {
                         line = in.readLine();
                         System.out.println("chatid: "+line);
                         
-                         chatid=new Integer(line).intValue();//!!!!!!!!!!!
+                        chatid=new Integer(line).intValue();//!!!!!!!!!!!
                         chat thechat=new chat();
                         
                         if (chatid<0) {
@@ -225,6 +222,7 @@ public class ChatServer {
                         line = in.readLine();
                         System.out.println("line:"+line);
                         
+/*
                         StringBuffer usersline=new StringBuffer();
                         int clients=thechat.users.size();
                         for(Iterator i=thechat.users.iterator();i.hasNext();){
@@ -232,9 +230,12 @@ public class ChatServer {
                             usersline.append(h.user+"\n");
                             usersline.append(h.nick+"\n");
                         }
+ */
                         
                         //todo: is inside sendToChat
-                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+//                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+thechat.users.size()+"\n"+serializeUsers(thechat.users));
+                        
                         
                         if (thechat.name!=null) sendToChat(chatid,msgIntro+"\n3\n1\n"+chatid+"\n"+thechat.name);
                         sendToChat(chatid,msgIntro+"\n4\n"+chatid+"\n"+lines+"\n"+line);
@@ -246,6 +247,18 @@ public class ChatServer {
                 System.out.println("Chyba6 "+e.getMessage());
             }
             
+        }
+        
+        public String serializeUsers(LinkedList users) {
+            StringBuffer usersline=new StringBuffer();
+            int clients=users.size();
+            for(Iterator i=users.iterator();i.hasNext();){
+                ClientThread h=(ClientThread)i.next();
+                usersline.append(h.user+"\n");
+                usersline.append(h.nick+"\n");
+            }
+            
+            return usersline.toString().trim();
         }
     }
     
@@ -299,22 +312,22 @@ public class ChatServer {
          */
         private LinkedList users=new LinkedList();
     }
-
+    
     public final class skUser {
         private String user;
-
+        
         private String nick;
-
+        
         private String family_name;
-
+        
         private String given_name;
     }
-
+    
     /**
      * nicknames from names.cfg file
      */
     private ArrayList users=new ArrayList();
-
+    
     public void downloadNicks() {
         try {
             BufferedReader afile=new BufferedReader(new FileReader("names.cfg"));;
@@ -335,6 +348,6 @@ public class ChatServer {
             System.out.println("Chyba "+ex.getMessage());
         }
     }
-
+    
     
 }
