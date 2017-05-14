@@ -10,7 +10,7 @@ public class ChatServer {
 
     //Rozoslanie spravy vsetkym
     private void sendToAll(String message){
-		System.out.println("snd "+(int)message.charAt(0)+" "+(message.length()-2)+" "+message.substring(1));
+		System.out.println("snd\n"+message);
         for(Iterator i=clientsList.iterator();i.hasNext();)
             ((ClientThread)i.next()).sendMessage(message);
     }
@@ -33,9 +33,7 @@ public class ChatServer {
         synchronized void sendMessage(String message){
             try{
 
-                out.write(message.charAt(0));
-				out.write(message.length()-2);
-				out.write(message.substring(1)+"\n");
+ 				out.write(message+"\n");
                 //Vyprazdnim buffer a tym prinutim poslat
                 out.flush();
             }catch (Exception e){
@@ -55,16 +53,22 @@ public class ChatServer {
                 //Precitam riadok
                 while ((line = in.readLine()) != null) {
                     //Vypis pre testovanie
-                    System.out.println("rcv"+line);
+                    System.out.println("rcv\n"+line);
                     //Rozpozlem spravu vsetkym
 
-					char msgCode=line.charAt(0);
+					int msgCode=new Integer(line).intValue();
 					switch (msgCode)
 					{
-						case 0x06:
-                    	sendToAll("\1"+line.substring(1));break;
-						case 0x00:
-						sendToAll("\0"+line.substring(1));break;
+						case 6:
+							line = in.readLine();
+							int users=new Integer(line).intValue();
+							line = in.readLine();
+							sendToAll("1\n"+users+"\n"+line);break;
+						case 0:
+							line = in.readLine();
+							int lines=new Integer(line).intValue();
+							line = in.readLine();
+							sendToAll("0\n"+lines+"\n"+line);break;
 						default:
 //						sendToAll(line.substring(1));break;
 //						sendToAll("\0"+line.substring(1));break;
