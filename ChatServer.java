@@ -161,7 +161,8 @@ public class ChatServer {
                                                         
 
                                                         if (chatidwas==-1) sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
-                                                        sendToChat(chatid,msgIntro+"\n0\n"+chatid+"\n"+lines+"\n"+line);
+                                                        if (thechat.name!=null) sendToChat(chatid,msgIntro+"\n3\n"+chatid+"\n"+thechat.name+"\n");
+                                                        sendToChat(chatid,msgIntro+"\n4\n"+chatid+"\n"+lines+"\n"+line);
                                                         //sendToThem(thechat.users,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
                                                         break;
@@ -246,7 +247,7 @@ public class ChatServer {
 }
 
     public final class chat {
-        private String name;
+        private String name=null;
 
         private LinkedList users=new LinkedList();
     }
