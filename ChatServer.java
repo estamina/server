@@ -45,7 +45,8 @@ public class ChatServer {
         BufferedReader in;
         //OutputStreamWriter out;
 		BufferedWriter out;
-
+           String msgIntro="\6";
+ 
         ClientThread(Socket clientSocket){
             this.clientSocket=clientSocket;
         }
@@ -74,7 +75,9 @@ public class ChatServer {
                 String line;
                 //Precitam riadok
                 while ((line = in.readLine()) != null) {
-                    //Vypis pre testovanie
+                      while (line.compareTo(msgIntro)!=0){line = in.readLine();}
+                    line = in.readLine();
+                  //Vypis pre testovanie
                     System.out.println("----------received\nmsgcode:"+line);
                     //Rozpozlem spravu vsetkym
 
@@ -96,7 +99,7 @@ public class ChatServer {
 //								System.out.println(userListGlobal+" in");
 							}
 
-							sendToAll("1\n"+clientsList.size()+userListGlobal.toString());
+							sendToAll(msgIntro+"\n1\n"+clientsList.size()+userListGlobal.toString());
 
 							break;
 						case 0:
@@ -145,8 +148,8 @@ public class ChatServer {
                                                         }
                                                         
 
-                                                        sendToChat(chatid,"2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
-                                                        sendToChat(chatid,"0\n"+chatid+"\n"+lines+"\n"+line);
+                                                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
+                                                        sendToChat(chatid,msgIntro+"\n0\n"+chatid+"\n"+lines+"\n"+line);
                                                         //sendToThem(chatusers,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
                                                         break;
@@ -182,7 +185,7 @@ public class ChatServer {
 //								System.out.println(userListGlobal+" in");
 							}
 
-							sendToAll("1\n"+(clientsList.size()-1)+userListGlobal.toString());
+							sendToAll(msgIntro+"\n1\n"+(clientsList.size()-1)+userListGlobal.toString());
             clientsList.remove(this);
         }
     }
