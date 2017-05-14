@@ -117,8 +117,11 @@ public class ChatServer {
 							int chatters=new Integer(line).intValue();
 							line = in.readLine();
 							System.out.println("user:"+line);
-                                                            if (chatid<0) chatusers.add(getUserThread(line));
-                                                            chats.add(chatusers);
+                                                            if (chatid<0){ 
+                                                                chatusers.add(getUserThread(line));
+                                                                chatid=chats.size();
+                                                                chats.add(chatusers);
+                                                            }
                                                         
                                                         
                                                         
@@ -132,7 +135,8 @@ public class ChatServer {
 							System.out.println("line:"+line);
 							//System.out.println(line);
                                                         
-                                                        sendToThem(chatusers,"0\n"+lines+"\n"+line);
+                                                        sendToChat(chatid,"0\n"+lines+"\n"+line);
+                                                        //sendToThem(chatusers,"0\n"+lines+"\n"+line);
 							//sendToAll("0\n"+lines+"\n"+line);
                                                         break;
 						default:
@@ -207,4 +211,11 @@ public class ChatServer {
             ((ClientThread)i.next()).sendMessage(message);
 
     }
+
+    public void sendToChat(int chatid,String message) {
+        LinkedList them=(LinkedList)chats.get(chatid);
+        System.out.println("-------sent\n"+message);
+        for(Iterator i=them.iterator();i.hasNext();)
+            ((ClientThread)i.next()).sendMessage(message);
+}
 }
