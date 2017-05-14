@@ -19,7 +19,7 @@ public class ChatServer {
     class ClientThread extends Thread {
         //Pomocou tohto socketu komunikujem s klientom
         Socket clientSocket;
-
+		public String user;
         //Streamy
         BufferedReader in;
         //OutputStreamWriter out;
@@ -37,7 +37,8 @@ public class ChatServer {
                 //Vyprazdnim buffer a tym prinutim poslat
                 out.flush();
             }catch (Exception e){
-                System.out.println("Chyba "+e.getMessage());
+                System.out.println("Chyba1 "+e.getMessage());
+
             }
         }
 
@@ -62,8 +63,20 @@ public class ChatServer {
 						case 6:
 							line = in.readLine();
 							int users=new Integer(line).intValue();
-							line = in.readLine();
-							sendToAll("1\n"+users+"\n"+line);break;
+
+							line = in.readLine();user=line;
+										  // System.out.println(user);
+							StringBuffer  userListGlobal = new StringBuffer(new String(""));
+
+							for(Iterator i=clientsList.iterator();i.hasNext();){
+//								System.out.println(userListGlobal+" in");
+								userListGlobal.append("\n"+((ClientThread)i.next()).user);
+//								System.out.println(userListGlobal+" in");
+							}
+
+							sendToAll("1\n"+clientsList.size()+userListGlobal.toString());
+
+							break;
 						case 0:
 							line = in.readLine();
 							int lines=new Integer(line).intValue();
@@ -85,10 +98,21 @@ public class ChatServer {
                 clientSocket.close();
 
             }catch (Exception e){
-                System.out.println("Chyba "+e.getMessage());
+                System.out.println("Chyba2 "+e.getMessage());
+
             }
 
             //Ak som skoncil komunikaciu vyhodim vlakno z obsluhy
+							StringBuffer  userListGlobal = new StringBuffer(new String(""));
+
+							for(Iterator i=clientsList.iterator();i.hasNext();){
+//								System.out.println(userListGlobal+" in");
+								String auser=((ClientThread)i.next()).user;
+								if (auser.compareTo(user)!=0)   userListGlobal.append("\n"+auser);
+//								System.out.println(userListGlobal+" in");
+							}
+
+							sendToAll("1\n"+(clientsList.size()-1)+userListGlobal.toString());
             clientsList.remove(this);
         }
     }
@@ -110,7 +134,7 @@ public class ChatServer {
                 ct.start();
             }
         }catch (Exception e){
-            System.out.println("Chyba "+e.getMessage());
+            System.out.println("Chyba3 "+e.getMessage());
         }
     }
 
