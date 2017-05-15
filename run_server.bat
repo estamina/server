@@ -1,4 +1,4 @@
 del *.class
-javac ChatServer.java
-start java -cp . ChatServer
+javac -cp .. skServer.java
+start java -cp .. server.skServer
 
