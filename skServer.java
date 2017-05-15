@@ -145,7 +145,7 @@ public class skServer {
                 
                 int msgCode=new Integer(line).intValue();
                 switch (msgCode) {
-                    case 9:
+                    case skCode.CHAT_EXIT:
                         int chatid=new Integer(line).intValue();//!!!!!!!!!!!
                         
                         System.out.println(" CHAT");
