@@ -1,6 +1,7 @@
 package server;
 import chat.skUser;
 import chat.skCode;
+import chat.skChat;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -318,16 +319,6 @@ public class skServer {
         //return hash;
     }
     
-    public final class skChat {
-        private String name=null;
-        
-        /**
-         * participats on this skChat
-         */
-        private LinkedList users=new LinkedList();
-
-        private int hash;
-    }
     
     /**
      * nicknames from names.cfg file
