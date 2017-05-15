@@ -165,15 +165,8 @@ public class ChatServer {
                         int users=new Integer(line).intValue();
                         
                         line = in.readLine();user=line;	 nick=getNick(user);
-                        
-                        StringBuffer userListGlobal = new StringBuffer(new String(""));
-                        
-                        for(Iterator i=clientsList.iterator();i.hasNext();){
-                            ClientThread ct= (ClientThread)i.next();
-                            userListGlobal.append("\n"+ct.user+"\n"+ct.nick);
-                        }
-                        
-                        sendToAll(msgIntro+"\n1\n"+clientsList.size()+userListGlobal.toString());
+
+                        sendToAll(msgIntro+"\n1\n"+clientsList.size()+serializeUsers(clientsList));
                         
                         break;
                     case 0:
@@ -222,18 +215,6 @@ public class ChatServer {
                         line = in.readLine();
                         System.out.println("line:"+line);
                         
-/*
-                        StringBuffer usersline=new StringBuffer();
-                        int clients=thechat.users.size();
-                        for(Iterator i=thechat.users.iterator();i.hasNext();){
-                            ClientThread h=(ClientThread)i.next();
-                            usersline.append(h.user+"\n");
-                            usersline.append(h.nick+"\n");
-                        }
- */
-                        
-                        //todo: is inside sendToChat
-//                        sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+clients+"\n"+usersline.toString().trim());
                         sendToChat(chatid,msgIntro+"\n2\n"+chatid+"\n"+thechat.users.size()+serializeUsers(thechat.users));
                         
                         
@@ -255,8 +236,6 @@ public class ChatServer {
             for(Iterator i=users.iterator();i.hasNext();){
                 ClientThread ct=(ClientThread)i.next();
                 usersline.append("\n"+ct.user+"\n"+ct.nick);
-                //usersline.append(h.user+"\n");
-                //usersline.append(h.nick+"\n");
             }
             
             return usersline.toString();//.trim();
@@ -341,6 +320,7 @@ public class ChatServer {
                 uu.given_name=afile.readLine();
                 users.add(uu);
             }
+            afile.close();
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
             System.out.println("Chyba "+ex.getMessage());
