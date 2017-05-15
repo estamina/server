@@ -160,6 +160,7 @@ public class skServer {
                                 sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+chatid+"\n"+lines+"\n"+nick+" left this chat");
                             }
                             System.out.println(" in chat");
+                            if (chusers.size()==0) chats.remove(i);
                         }
                         
                         break;
