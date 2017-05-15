@@ -1,7 +1,6 @@
 package server;
 import chat.skUser;
 import chat.skCode;
-import chat.skChat;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -12,10 +11,10 @@ public class skServer {
     /**
      * list of client threads for each connected user
      */
-    private LinkedList clientsList = new LinkedList();
+    LinkedList clientsList = new LinkedList();
     
     
-    private synchronized void sendToAll(String message){
+    private void sendToAll(String message){
         System.out.println("-------sent\n"+message);
         for(Iterator i=clientsList.iterator();i.hasNext();)
             ((skNetwork)i.next()).sendMessage(message);
@@ -60,18 +59,15 @@ public class skServer {
      */
     class skNetwork extends Thread {
         
-        private Socket clientSocket;
-        String user;
-        String nick;
+        Socket clientSocket;
+        public String user,nick;
         
-        private BufferedReader in;
+        BufferedReader in;
         //OutputStreamWriter out;
-        private BufferedWriter out;
+        BufferedWriter out;
         
-        skNetwork(Socket clientSocket, ArrayList chats, LinkedList clientsList){
+        skNetwork(Socket clientSocket){
             this.clientSocket=clientSocket;
-            this.chats=chats;
-            this.clientsList=clientsList;
         }
         
         
@@ -126,13 +122,12 @@ public class skServer {
             
             System.out.println(" CHAT");
             for(int i=0;i<chats.size();i++){
-                LinkedList chusers=((skChat)chats.get(i)).users;
+                LinkedList chusers=(LinkedList)chats.get(i);
                 if (chusers.contains(this)) {
-                    int chid=((skChat)chats.get(i)).hash;
                     chusers.remove(this);
-                    sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+chid+"\n"+chusers.size()+serializeUsers(chusers));
+                    sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+i+"\n"+chusers.size()+serializeUsers(chusers));
                     int lines=1;
-                    sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+chid+"\n"+lines+"\n"+nick+" disappeared");
+                    sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+i+"\n"+lines+"\n"+nick+" disappeared");
                 }
                 System.out.println(" in chat");
             }
@@ -152,19 +147,18 @@ public class skServer {
                 int msgCode=new Integer(line).intValue();
                 switch (msgCode) {
                     case skCode.CHAT_EXIT:
-                        int chatid=new Integer(in.readLine()).intValue();//!!!!!!!!!!!
+                        int chatid=new Integer(line).intValue();//!!!!!!!!!!!
                         
                         System.out.println(" CHAT");
                         for(int i=0;i<chats.size();i++){
-                            LinkedList chusers=((skChat)chats.get(i)).users;
+                            LinkedList chusers=(LinkedList)chats.get(i);
                             if (chusers.contains(this)) {
                                 chusers.remove(this);
-                                sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+chatid+"\n"+chusers.size()+serializeUsers(chusers));
+                                sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+i+"\n"+chusers.size()+serializeUsers(chusers));
                                 int lines=1;
-                                sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+chatid+"\n"+lines+"\n"+nick+" left this chat");
+                                sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+i+"\n"+lines+"\n"+nick+" left this chat");
                             }
                             System.out.println(" in chat");
-                            if (chusers.size()==0) chats.remove(i);
                         }
                         
                         break;
@@ -191,11 +185,7 @@ public class skServer {
                             
                             thechat.users.add(this);
                             
-                        }else {
-                            //thechat.users=(LinkedList)chats.get(chatid);
-                            //thechat.users=((skChat)chats.get(findChat(chatid))).users;
-                            thechat=(skChat)chats.get(findChat(chatid));
-                        }
+                        }else thechat.users=(LinkedList)chats.get(chatid);
                         
                         line = in.readLine();
                         System.out.println("users:"+line);
@@ -205,11 +195,10 @@ public class skServer {
                             line = in.readLine();
                             System.out.println("user:"+line);
                             thechat.users.add(getUserThread(line));
-                            chatid=thechat.users.hashCode();//@todo temporary solution
-                            thechat.hash=chatid;
-                            //chatid=chats.size();
+                            //chatid=thechat.hashCode();//@todo temporary solution
+                            chatid=chats.size();
                             if (thechat.users.size()>2) thechat.name=new String(chatid+"#");
-                            chats.add(thechat);//chats.add(thechat.users);
+                            chats.add(thechat.users);
                         }else{
                             for (int i=0;i<chatters;i++){
                                 line = in.readLine();
@@ -262,11 +251,6 @@ public class skServer {
             
             return usersline.toString();
         }
-
-        private ArrayList chats;
-
-        private LinkedList clientsList;
-        
     }
     
     
@@ -280,7 +264,7 @@ public class skServer {
             while(true){
                 Socket acceptedSocket = socket.accept();
                 
-                skNetwork ct = new skNetwork(acceptedSocket, chats, clientsList);
+                skNetwork ct = new skNetwork(acceptedSocket);
                 
                 ct.start();
             }
@@ -311,21 +295,20 @@ public class skServer {
     public void sendToChat(int chatid,String message) {
         //@todo on skCode.CHATS it should be sent only to first time members of chatid
         //now it sends every time to each client
-        //LinkedList them=(LinkedList)chats.get(chatid);
-        LinkedList them=((skChat)chats.get(findChat(chatid))).users;
+        LinkedList them=(LinkedList)chats.get(chatid);
         System.out.println("-------sent\n"+message);
         for(Iterator i=them.iterator();i.hasNext();)
             ((skNetwork)i.next()).sendMessage(message);
     }
     
-    public int findChat(int hash) {
-        for (int i=0;i<chats.size();i++){
-            if (((skChat)chats.get(i)).hash==hash) return i;        
-        }        
-        return 0;
-        //return hash;
+    public final class skChat {
+        private String name=null;
+        
+        /**
+         * participats on this skChat
+         */
+        private LinkedList users=new LinkedList();
     }
-    
     
     /**
      * nicknames from names.cfg file
