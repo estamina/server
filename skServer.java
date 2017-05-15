@@ -126,7 +126,6 @@ public class skServer {
                 if (chusers.contains(this)) {
                     chusers.remove(this);
                     int chid=findChat(i);
-                    //chid=i;
                     sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+chid+"\n"+chusers.size()+serializeUsers(chusers));
                     int lines=1;
                     sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+chid+"\n"+lines+"\n"+nick+" disappeared");
@@ -157,7 +156,6 @@ public class skServer {
                             if (chusers.contains(this)) {
                                 chusers.remove(this);
                                 int chid=findChat(i);
-                                //chid=i;
                                 sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+chid+"\n"+chusers.size()+serializeUsers(chusers));
                                 int lines=1;
                                 sendToChat(i,skCode.MSGINTRO+"\n"+skCode.SERVER_TEXT+"\n"+chid+"\n"+lines+"\n"+nick+" left this chat");
@@ -203,7 +201,7 @@ public class skServer {
                             System.out.println("user:"+line);
                             thechat.users.add(getUserThread(line));
                             chatid=thechat.hashCode();//@todo temporary solution
-                            //chatid=chats.size();
+                            chatid=chats.size();
                             if (thechat.users.size()>2) thechat.name=new String(chatid+"#");
                             chats.add(thechat.users);
                         }else{
@@ -311,10 +309,8 @@ public class skServer {
     }
     
     public int findChat(int hash) {
-        for (int i=0;i<chats.size();i++){
-            if (chats.get(i).hashCode()==hash) return i;
-        }
-        return 0;
+        //for (int i=0;i<chats.size();i++){            if (chats.get(i).hashCode()==hash) return i;        }        return 0;
+        return hash;
     }
     
     public final class skChat {
