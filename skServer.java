@@ -122,9 +122,9 @@ public class skServer {
             
             System.out.println(" CHAT");
             for(int i=0;i<chats.size();i++){
-                LinkedList chusers=(LinkedList)chats.get(i);
+                LinkedList chusers=((skChat)chats.get(i)).users;
                 if (chusers.contains(this)) {
-                    int chid=chats.get(i).hashCode();
+                    int chid=((skChat)chats.get(i)).hash;
                     chusers.remove(this);
                     sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+chid+"\n"+chusers.size()+serializeUsers(chusers));
                     int lines=1;
@@ -152,7 +152,7 @@ public class skServer {
                         
                         System.out.println(" CHAT");
                         for(int i=0;i<chats.size();i++){
-                            LinkedList chusers=(LinkedList)chats.get(i);
+                            LinkedList chusers=((skChat)chats.get(i)).users;
                             if (chusers.contains(this)) {
                                 chusers.remove(this);
                                 sendToChat(i,skCode.MSGINTRO+"\n"+skCode.CHAT_USERS+"\n"+chatid+"\n"+chusers.size()+serializeUsers(chusers));
@@ -188,7 +188,8 @@ public class skServer {
                             
                         }else {
                             //thechat.users=(LinkedList)chats.get(chatid);
-                            thechat.users=(LinkedList)chats.get(findChat(chatid));
+                            //thechat.users=((skChat)chats.get(findChat(chatid))).users;
+                            thechat=(skChat)chats.get(findChat(chatid));
                         }
                         
                         line = in.readLine();
@@ -199,10 +200,11 @@ public class skServer {
                             line = in.readLine();
                             System.out.println("user:"+line);
                             thechat.users.add(getUserThread(line));
-                            chatid=thechat.hashCode();//@todo temporary solution
+                            chatid=thechat.users.hashCode();//@todo temporary solution
+                            thechat.hash=chatid;
                             //chatid=chats.size();
                             if (thechat.users.size()>2) thechat.name=new String(chatid+"#");
-                            chats.add(thechat.users);
+                            chats.add(thechat);//chats.add(thechat.users);
                         }else{
                             for (int i=0;i<chatters;i++){
                                 line = in.readLine();
@@ -301,7 +303,7 @@ public class skServer {
         //@todo on skCode.CHATS it should be sent only to first time members of chatid
         //now it sends every time to each client
         //LinkedList them=(LinkedList)chats.get(chatid);
-        LinkedList them=(LinkedList)chats.get(findChat(chatid));
+        LinkedList them=((skChat)chats.get(findChat(chatid))).users;
         System.out.println("-------sent\n"+message);
         for(Iterator i=them.iterator();i.hasNext();)
             ((skNetwork)i.next()).sendMessage(message);
@@ -309,7 +311,7 @@ public class skServer {
     
     public int findChat(int hash) {
         for (int i=0;i<chats.size();i++){
-            if (chats.get(i).hashCode()==hash) return i;        
+            if (((skChat)chats.get(i)).hash==hash) return i;        
         }        
         return 0;
         //return hash;
@@ -322,6 +324,8 @@ public class skServer {
          * participats on this skChat
          */
         private LinkedList users=new LinkedList();
+
+        private int hash;
     }
     
     /**
