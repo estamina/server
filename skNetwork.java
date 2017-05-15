@@ -40,11 +40,12 @@ class skNetwork extends Thread {
     }
     
     
-    synchronized void sendMessage(String message){
+    void sendMessage(String message){
         try {
             out.write(message+"\n");
             //flushing a buffer to send a message
             out.flush();
+            System.out.println("<--sendMsg "+this.hashCode());
         } catch (IOException ex) {
             ex.printStackTrace();
             System.out.println("Chyba1 "+ex.getMessage());
@@ -110,7 +111,7 @@ class skNetwork extends Thread {
      * decoding incoming messages and sending responses
      */
     private synchronized void decode() {
-        System.out.println("-->decode");
+        System.out.println("-->decode "+this.currentThread().getName()+" "+this.hashCode());
         String line;
         try {
             
@@ -249,7 +250,12 @@ class skNetwork extends Thread {
             System.out.println("Chyba6.0 "+ex.getMessage());
             
         }
-        System.out.println("<--decode");
+        System.out.println("<--decode "+this.currentThread().getName()+" "+this.hashCode());
+        try {
+            wait();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
     
     private String serializeUsers(List users) {

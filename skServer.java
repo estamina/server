@@ -20,7 +20,7 @@ public class skServer {
     private List clients = Collections.synchronizedList(new LinkedList());
     
     
-    synchronized void sendToAll(String message){
+    void sendToAll(String message){
         System.out.println("-------sent\n"+message);
         synchronized(clients){
             for(Iterator i=clients.iterator();i.hasNext();)
