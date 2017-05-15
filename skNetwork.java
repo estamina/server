@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Collections;
 
 
 
@@ -30,7 +32,7 @@ class skNetwork extends Thread {
     //OutputStreamWriter out;
     private BufferedWriter out;
     
-    skNetwork(skServer skServer, Socket clientSocket, ArrayList chats, LinkedList clientsList){
+    skNetwork(skServer skServer, Socket clientSocket, ArrayList chats, List clientsList){
         this.skServer = skServer;
         this.clientSocket=clientSocket;
         this.chats=chats;
@@ -250,19 +252,20 @@ class skNetwork extends Thread {
         System.out.println("<--decode");
     }
     
-    private String serializeUsers(LinkedList users) {
+    private String serializeUsers(List users) {
         StringBuffer usersline = new StringBuffer();
-        int clients = users.size();
-        for (Iterator i = users.iterator(); i.hasNext(); ){
-            skNetwork ct = (skNetwork)i.next();
-            usersline.append("\n"+ct.user+"\n"+ct.nick);
+        synchronized(users){
+            int clients = users.size();
+            for (Iterator i = users.iterator(); i.hasNext(); ){
+                skNetwork ct = (skNetwork)i.next();
+                usersline.append("\n"+ct.user+"\n"+ct.nick);
+            }
         }
-        
         return usersline.toString();
     }
     
     private ArrayList chats;
     
-    private LinkedList clients;
+    private List clients = Collections.synchronizedList(new LinkedList());
     
 }

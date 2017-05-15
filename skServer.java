@@ -4,7 +4,12 @@ import chat.skCode;
 import chat.skChat;
 import java.net.*;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Collections;
+
 
 public class skServer {
     private static int CHAT_PORT=12345;
@@ -12,13 +17,15 @@ public class skServer {
     /**
      * list of client threads for each connected user
      */
-    private LinkedList clients = new LinkedList();
+    private List clients = Collections.synchronizedList(new LinkedList());
     
     
     synchronized void sendToAll(String message){
         System.out.println("-------sent\n"+message);
-        for(Iterator i=clients.iterator();i.hasNext();)
-            ((skNetwork)i.next()).sendMessage(message);
+        synchronized(clients){
+            for(Iterator i=clients.iterator();i.hasNext();)
+                ((skNetwork)i.next()).sendMessage(message);
+        }
         System.out.println("<--sent");
     }
     
@@ -41,14 +48,16 @@ public class skServer {
     public skNetwork getUserThread(String user) {
         //String user=null;
         skNetwork needle=null;
-        for (Iterator i=clients.iterator();i.hasNext();){
-            needle=(skNetwork)i.next();
-            System.out.println(needle.user+" "+needle.nick+" "+user.trim());
-            if ((needle).user.compareTo(user.trim())==0) {
-                //user=needle.user;
-                System.out.println(needle.user+" found "+needle.nick);
-                
-                break;
+        synchronized(clients){
+            for (Iterator i=clients.iterator();i.hasNext();){
+                needle=(skNetwork)i.next();
+                System.out.println(needle.user+" "+needle.nick+" "+user.trim());
+                if ((needle).user.compareTo(user.trim())==0) {
+                    //user=needle.user;
+                    System.out.println(needle.user+" found "+needle.nick);
+                    
+                    break;
+                }
             }
         }
         return needle;
@@ -105,8 +114,8 @@ public class skServer {
     
     public int findChat(int hash) {
         for (int i=0;i<chats.size();i++){
-            if (((skChat)chats.get(i)).hash==hash) return i;        
-        }        
+            if (((skChat)chats.get(i)).hash==hash) return i;
+        }
         return 0;
         //return hash;
     }
