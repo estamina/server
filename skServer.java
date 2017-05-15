@@ -72,20 +72,19 @@ public class skServer {
         
         
         void sendMessage(String message){
-            try{
-                
+            try {
                 out.write(message+"\n");
                 //flushing a buffer to send a message
                 out.flush();
-            }catch (Exception e){
-                System.out.println("Chyba1 "+e.getMessage());
-                
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.out.println("Chyba1 "+ex.getMessage());
             }
         }
         
         
         public void run() {
-            try{
+            try {
                 
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
@@ -103,11 +102,11 @@ public class skServer {
                 out.close();
                 
                 clientSocket.close();
-                
-            }catch (Exception e){
-                System.out.println("Chyba2 "+e.getMessage());
-                
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.out.println("Chyba2 "+ex.getMessage());
             }
+            
             
             StringBuffer  userListGlobal = new StringBuffer(new String(""));
             
@@ -139,6 +138,7 @@ public class skServer {
         synchronized public void decode() {
             String line;
             try {
+                
                 line = in.readLine();
                 
                 System.out.println("----------received\nmsgcode:"+line);
@@ -226,8 +226,14 @@ public class skServer {
                     default:
                         
                 }
-            }catch (Exception e){
-                System.out.println("Chyba6 "+e.getMessage());
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                System.out.println("Chyba6 "+ex.getMessage());
+                
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.out.println("Chyba6.0 "+ex.getMessage());
+                
             }
             
         }
@@ -247,7 +253,7 @@ public class skServer {
     
     private void main(){
         downloadNicks();
-        try{
+        try {
             //waiting for socket on this port
             ServerSocket socket = new ServerSocket(CHAT_PORT);
             
@@ -259,8 +265,9 @@ public class skServer {
                 
                 ct.start();
             }
-        }catch (Exception e){
-            System.out.println("Chyba3 "+e.getMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            System.out.println("Chyba3 "+ex.getMessage());
         }
     }
     
